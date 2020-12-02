@@ -2,7 +2,7 @@ package me.xx2bab.asmdemo
 
 import org.objectweb.asm.*
 import org.objectweb.asm.Opcodes.ASM9
-import java.io.File
+import java.io.InputStream
 
 fun main() {
     Weaver01AddRemoveFieldAndMethod().process()
@@ -11,11 +11,11 @@ fun main() {
 class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
 
     override fun getClassName(): String {
-        return "JavaTest01AddFieldAndMethod.class"
+        return "JavaTest01AddRemoveFieldAndMethod.class"
     }
 
-    override fun onProcess(classFile: File): ByteArray {
-        val classReader = ClassReader(classFile.readBytes())
+    override fun onProcess(inputStream: InputStream): ByteArray {
+        val classReader = ClassReader(inputStream)
         val classWriter = ClassWriter(0) // classReader, COMPUTE_MAXS or COMPUTE_FRAMES
         val classVisitor = object : ClassVisitor(ASM9, classWriter) {
             override fun visitEnd() {
@@ -23,7 +23,7 @@ class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
                 val fieldVisitor = visitField(
                     Opcodes.ACC_PUBLIC,
                     "newFieldName",
-                    "Ljava/lang/String",
+                    "Ljava/lang/String; ",
                     null,
                     null
                 )
@@ -31,7 +31,7 @@ class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
                 val methodVisitor = visitMethod(
                     Opcodes.ACC_PUBLIC,
                     "newMethodName",
-                    "(ILjava/lang/String;)V",
+                    "(ILjava/lang/String; )V",
                     null,
                     null
                 )
@@ -45,7 +45,7 @@ class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
                 signature: String?,
                 exceptions: Array<out String>?
             ): MethodVisitor? {
-                if (name == "output") {
+                if (name == "outputTobeRemoved") {
                     println("output method detected")
                     return null
                 }
