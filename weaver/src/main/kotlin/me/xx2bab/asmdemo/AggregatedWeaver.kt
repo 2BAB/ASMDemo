@@ -8,7 +8,7 @@ import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
 
-fun main() {
+fun main(args: Array<String>) {
     AggregatedWeaver().process()
 }
 

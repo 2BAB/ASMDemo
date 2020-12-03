@@ -1,10 +1,12 @@
 package me.xx2bab.asmdemo
 
 import org.objectweb.asm.*
+import org.objectweb.asm.ClassWriter.COMPUTE_MAXS
 import org.objectweb.asm.Opcodes.ASM9
+import org.objectweb.asm.util.CheckClassAdapter
 import java.io.InputStream
 
-fun main() {
+fun main(args: Array<String>) {
     Weaver01AddRemoveFieldAndMethod().process()
 }
 
@@ -20,22 +22,22 @@ class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
         val classVisitor = object : ClassVisitor(ASM9, classWriter) {
             override fun visitEnd() {
                 super.visitEnd()
-                val fieldVisitor = visitField(
-                    Opcodes.ACC_PUBLIC,
-                    "newFieldName",
-                    "Ljava/lang/String; ",
-                    null,
-                    null
-                )
-                fieldVisitor?.visitEnd()
-                val methodVisitor = visitMethod(
-                    Opcodes.ACC_PUBLIC,
-                    "newMethodName",
-                    "(ILjava/lang/String; )V",
-                    null,
-                    null
-                )
-                methodVisitor?.visitEnd()
+//                val fieldVisitor = visitField(
+//                    Opcodes.ACC_PUBLIC,
+//                    "newFieldName",
+//                    "Ljava/lang/String;",
+//                    null,
+//                    null
+//                )
+//                fieldVisitor?.visitEnd()
+//                val methodVisitor = visitMethod(
+//                    Opcodes.ACC_PUBLIC,
+//                    "newMethodName",
+//                    "(ILjava/lang/String;)V",
+//                    null,
+//                    null
+//                )
+//                methodVisitor?.visitEnd()
             }
 
             override fun visitMethod(
@@ -52,7 +54,7 @@ class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
                 return super.visitMethod(access, name, descriptor, signature, exceptions)
             }
         }
-        classReader.accept(classVisitor, ClassReader.SKIP_CODE or ClassReader.SKIP_DEBUG)
+        classReader.accept(classVisitor, 0)
         return classWriter.toByteArray()
     }
 
