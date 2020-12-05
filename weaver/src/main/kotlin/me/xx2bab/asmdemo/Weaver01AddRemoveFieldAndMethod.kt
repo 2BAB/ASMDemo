@@ -1,16 +1,18 @@
 package me.xx2bab.asmdemo
 
 import org.objectweb.asm.*
+import org.objectweb.asm.ClassWriter.COMPUTE_FRAMES
 import org.objectweb.asm.ClassWriter.COMPUTE_MAXS
-import org.objectweb.asm.Opcodes.ASM9
+import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.util.CheckClassAdapter
 import java.io.InputStream
 
-fun main(args: Array<String>) {
+
+fun main() {
     Weaver01AddRemoveFieldAndMethod().process()
 }
 
-class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
+class Weaver01AddRemoveFieldAndMethod : BaseWeaver() {
 
     override fun getClassName(): String {
         return "JavaTest01AddRemoveFieldAndMethod.class"
@@ -18,28 +20,11 @@ class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
 
     override fun onProcess(inputStream: InputStream): ByteArray {
         val classReader = ClassReader(inputStream)
-        val classWriter = ClassWriter(0) // classReader, COMPUTE_MAXS or COMPUTE_FRAMES
-        val classVisitor = object : ClassVisitor(ASM9, classWriter) {
-            override fun visitEnd() {
-                super.visitEnd()
-//                val fieldVisitor = visitField(
-//                    Opcodes.ACC_PUBLIC,
-//                    "newFieldName",
-//                    "Ljava/lang/String;",
-//                    null,
-//                    null
-//                )
-//                fieldVisitor?.visitEnd()
-//                val methodVisitor = visitMethod(
-//                    Opcodes.ACC_PUBLIC,
-//                    "newMethodName",
-//                    "(ILjava/lang/String;)V",
-//                    null,
-//                    null
-//                )
-//                methodVisitor?.visitEnd()
-            }
-
+        val classWriter = ClassWriter(classReader, COMPUTE_FRAMES or COMPUTE_MAXS)
+        val classVisitor = object : ClassVisitor(
+            ASM9,
+            CheckClassAdapter(classWriter, true)
+        ) {
             override fun visitMethod(
                 access: Int,
                 name: String?,
@@ -55,6 +40,44 @@ class Weaver01AddRemoveFieldAndMethod: BaseWeaver() {
             }
         }
         classReader.accept(classVisitor, 0)
+
+        // Add a new field
+        classWriter.visitField(
+            Opcodes.ACC_PUBLIC,
+            "newFieldName",
+            "Ljava/lang/String;",
+            null,
+            null
+        ).visitEnd()
+
+        // Add a new method
+        val mw = classWriter.visitMethod(
+            Opcodes.ACC_PUBLIC,
+            "create",
+            "()V",
+            null,
+            null
+        )
+        mw.visitFieldInsn(
+            GETSTATIC,
+            "java/lang/System",
+            "out",
+            "Ljava/io/PrintStream;"
+        )
+        mw.visitLdcInsn("this is add method print!")
+        mw.visitMethodInsn(
+            INVOKEVIRTUAL,
+            "java/io/PrintStream",
+            "println",
+            "(Ljava/lang/String;)V",
+            false
+        )
+        mw.visitInsn(RETURN)
+        // this code uses a maximum of two stack elements and two local
+        // variables
+        mw.visitMaxs(0, 0)
+        mw.visitEnd()
+
         return classWriter.toByteArray()
     }
 
