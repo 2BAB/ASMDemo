@@ -95,7 +95,7 @@ class ThreadReplaceMethodVisitor(
         println("visitTypeInsn $type")
         if (opcode == NEW && type == "java/lang/Thread") {
             found = true
-            superVisitor.visitTypeInsn(NEW, "me/xx2bab/asmdemo/RecordThread")
+            superVisitor.visitTypeInsn(NEW, "me/xx2bab/asmdemo/helper02/RecordThread")
             return
         }
         super.visitTypeInsn(opcode, type)
@@ -110,9 +110,9 @@ class ThreadReplaceMethodVisitor(
     ) {
         println("visitMethodInsn $methodName")
         if (found && opcode == INVOKESPECIAL && owner == "java/lang/Thread"
-            && className != "me/xx2bab/asmdemo/RecordThread") {
+            && className != "me/xx2bab/asmdemo/helper02/RecordThread") {
             found = false
-            superVisitor.visitMethodInsn(INVOKESPECIAL, "me/xx2bab/asmdemo/RecordThread",
+            superVisitor.visitMethodInsn(INVOKESPECIAL, "me/xx2bab/asmdemo/helper02/RecordThread",
                 methodName, descriptor, isInterface)
             return
         }

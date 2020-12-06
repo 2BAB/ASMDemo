@@ -7,6 +7,8 @@ public class JavaTestMain {
         test01.output();
         JavaTest02ReplaceNewThread test02 = new JavaTest02ReplaceNewThread();
         test02.output();
+        JavaTest03ReplaceWakeLockMethodCalling test03 = new JavaTest03ReplaceWakeLockMethodCalling();
+        test03.output();
     }
 
 }

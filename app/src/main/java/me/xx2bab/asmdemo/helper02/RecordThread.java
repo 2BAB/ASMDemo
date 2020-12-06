@@ -1,4 +1,4 @@
-package me.xx2bab.asmdemo;
+package me.xx2bab.asmdemo.helper02;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

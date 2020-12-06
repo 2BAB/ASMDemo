@@ -14,7 +14,11 @@ fun main(args: Array<String>) {
 
 class AggregatedWeaver {
 
-    private val weavers = setOf(Weaver01AddRemoveFieldAndMethod(), Weaver02ReplaceNewThread())
+    private val weavers = setOf(
+        Weaver01AddRemoveFieldAndMethod(),
+        Weaver02ReplaceNewThread(),
+        Weaver03ReplaceWakeLockMethodCalling()
+    )
 
     fun process() {
         DebugFlags.processSingleClass = false
@@ -23,16 +27,19 @@ class AggregatedWeaver {
         extractJarWhenAdded(File("./app/build/libs/app-1.0-SNAPSHOT.jar"))
     }
 
-    private fun onProcess(className:String, inputStream: InputStream): ByteArray {
-        val weaver = weavers.firstOrNull { className.contains(it.getClassName()) } ?: return IOUtils.toByteArray(inputStream)
+    private fun onProcess(className: String, inputStream: InputStream): ByteArray {
+        val weaver =
+            weavers.firstOrNull { className.contains(it.getClassName()) } ?: return IOUtils.toByteArray(inputStream)
         return weaver.onProcess(inputStream)
     }
 
     private fun extractJarWhenAdded(jarInput: File) {
         val jar = JarFile(jarInput)
         val enumeration = jar.entries()
-        val tmpFile = File(jarInput.parent + File.separator
-                + "classes_modified_${jarInput.nameWithoutExtension}.jar")
+        val tmpFile = File(
+            jarInput.parent + File.separator
+                    + "classes_modified_${jarInput.nameWithoutExtension}.jar"
+        )
         if (tmpFile.exists()) {
             tmpFile.delete()
         }

@@ -51,32 +51,32 @@ class Weaver01AddRemoveFieldAndMethod : BaseWeaver() {
         ).visitEnd()
 
         // Add a new method
-        val mw = classWriter.visitMethod(
+        val mv = classWriter.visitMethod(
             Opcodes.ACC_PUBLIC,
             "create",
             "()V",
             null,
             null
         )
-        mw.visitFieldInsn(
+        mv.visitFieldInsn(
             GETSTATIC,
             "java/lang/System",
             "out",
             "Ljava/io/PrintStream;"
         )
-        mw.visitLdcInsn("this is add method print!")
-        mw.visitMethodInsn(
+        mv.visitLdcInsn("this is add method print!")
+        mv.visitMethodInsn(
             INVOKEVIRTUAL,
             "java/io/PrintStream",
             "println",
             "(Ljava/lang/String;)V",
             false
         )
-        mw.visitInsn(RETURN)
+        mv.visitInsn(RETURN)
         // this code uses a maximum of two stack elements and two local
         // variables
-        mw.visitMaxs(0, 0)
-        mw.visitEnd()
+        mv.visitMaxs(0, 0)
+        mv.visitEnd()
 
         return classWriter.toByteArray()
     }
